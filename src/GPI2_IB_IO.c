@@ -360,9 +360,12 @@ pgaspi_wait (const gaspi_queue_id_t queue, const gaspi_timeout_t timeout_ms)
     }//for
 #ifdef GPI2_CUDA 
      int j,k;
-   for(k=0;k<glb_gaspi_ctx.gpu_count;k++)
+   
+   for(k=0;k<glb_gaspi_ctx.gpu_count;k++){
      for(j = 0; j < GASPI_CUDA_EVENTS; j++)
        gpus[k].events[queue][j].ib_use=0;
+      // cudaStreamSynchronize(gpus[k].streams[queue]);
+    }
 #endif
 
   unlock_gaspi (&glb_gaspi_ctx.lockC[queue]);

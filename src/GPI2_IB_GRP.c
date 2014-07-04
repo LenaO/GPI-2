@@ -18,7 +18,10 @@ along with GPI-2. If not, see <http://www.gnu.org/licenses/>.
 #include "GPI2.h"
 #include "GASPI.h"
 #include "GPI2_IB.h"
-
+#ifdef GPI2_CUDA
+#include <cuda.h>
+#include <cuda_runtime.h>
+#endif
 
 const unsigned int glb_gaspi_typ_size[6] = { 4, 4, 4, 8, 8, 8 };
 void (*fctArrayGASPI[18]) (void *, void *, void *, const unsigned char cnt) ={NULL};
@@ -640,6 +643,15 @@ pgaspi_allreduce (gaspi_pointer_t const buf_send,
   volatile unsigned char *poll_buf = (volatile unsigned char *) (glb_gaspi_group_ib[g].buf);
 
   unsigned char *send_ptr = glb_gaspi_group_ib[g].buf + COLL_MEM_SEND + (glb_gaspi_group_ib[g].togle * 18 * 2048);
+ #ifdef GPI2_CUDA 
+  CUmemorytype  data; 
+  cuPointerGetAttribute (&data , CU_POINTER_ATTRIBUTE_MEMORY_TYPE, (uintptr_t) buf_send);
+  if(data==CU_MEMORYTYPE_DEVICE) {
+    if(cudaMemcpy(send_ptr,buf_send,dsize, cudaMemcpyDeviceToHost))
+      printf("error cuda memypy device to host \n");
+  }
+  else
+#endif
   memcpy (send_ptr, buf_send, dsize);
 
   unsigned char *recv_ptr = glb_gaspi_group_ib[g].buf + COLL_MEM_RECV;
@@ -910,6 +922,16 @@ pgaspi_allreduce (gaspi_pointer_t const buf_send,
   glb_gaspi_group_ib[g].level = 0;
   glb_gaspi_group_ib[g].dsize = 0;
   glb_gaspi_group_ib[g].bid   = 0;
+#ifdef GPI2_CUDA
+
+   cuPointerGetAttribute (&data , CU_POINTER_ATTRIBUTE_MEMORY_TYPE, (uintptr_t) buf_recv);
+    if(data==CU_MEMORYTYPE_DEVICE) {
+      if(cudaMemcpy(buf_recv,send_ptr,dsize, cudaMemcpyHostToDevice))
+	 printf("error cuda memypy host to device \n");
+  }
+   else
+#endif
+
 
   memcpy (buf_recv, send_ptr, dsize);
   unlock_gaspi (&glb_gaspi_group_ib[g].gl);
@@ -1003,7 +1025,18 @@ pgaspi_allreduce_user (gaspi_pointer_t const buf_send,
   volatile unsigned char *poll_buf = (volatile unsigned char *) (glb_gaspi_group_ib[g].buf);
 
   unsigned char *send_ptr = glb_gaspi_group_ib[g].buf + COLL_MEM_SEND + (glb_gaspi_group_ib[g].togle * 18 * 2048);
+#ifdef GPI2_CUDA 
+  CUmemorytype  data; 
+  cuPointerGetAttribute (&data , CU_POINTER_ATTRIBUTE_MEMORY_TYPE, (uintptr_t) buf_send);
+  if(data==CU_MEMORYTYPE_DEVICE) {
+    if(cudaMemcpy(send_ptr,buf_send,dsize, cudaMemcpyDeviceToHost))
+      printf("error cuda memypy device to host \n");
+  }
+  else
+#endif
+
   memcpy (send_ptr, buf_send, dsize);
+
 
   unsigned char *recv_ptr = glb_gaspi_group_ib[g].buf + COLL_MEM_RECV;
 
@@ -1269,6 +1302,16 @@ pgaspi_allreduce_user (gaspi_pointer_t const buf_send,
   glb_gaspi_group_ib[g].level = 0;
   glb_gaspi_group_ib[g].dsize = 0;
   glb_gaspi_group_ib[g].bid   = 0;
+#ifdef GPI2_CUDA
+
+   cuPointerGetAttribute (&data , CU_POINTER_ATTRIBUTE_MEMORY_TYPE, (uintptr_t) buf_recv);
+    if(data==CU_MEMORYTYPE_DEVICE) {
+      if(cudaMemcpy(buf_recv,send_ptr,dsize, cudaMemcpyHostToDevice))
+	 printf("error cuda memypy host to device \n");
+  }
+   else
+#endif
+
 
   memcpy (buf_recv, send_ptr, dsize);
 

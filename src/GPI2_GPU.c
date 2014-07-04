@@ -159,6 +159,31 @@ gaspi_return_t gaspi_init_GPUs()
   }
 
   glb_gaspi_ctx.use_gpus = 1;
+//// Register Grou segments for GPU to allow allreduce with GPU-pointer
+  int id, size;
+  for (i = 0; i < GASPI_MAX_GROUPS; i++)
+  {
+    if (glb_gaspi_group_ib[i].id >=0)
+    {
+      
+      id = glb_gaspi_group_ib[i].id;
+
+      if(id == GASPI_GROUP_ALL)
+        size = NEXT_OFFSET + 128 + NOTIFY_OFFSET; 
+      else
+        size = NEXT_OFFSET;
+
+      if(cudaHostRegister  (glb_gaspi_group_ib[i].ptr, size,cudaHostRegisterPortable)){
+        gaspi_print_error("Unable to register Group memory for GPU\n");
+        printf("get error %s, %p, %d %d \n", cudaGetErrorString(cudaGetLastError()), glb_gaspi_group_ib[id].ptr,id);
+        return GASPI_ERROR; 
+
+
+      }
+
+    }
+
+  }
 
   return GASPI_SUCCESS;
 }

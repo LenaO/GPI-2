@@ -23,7 +23,7 @@ along with GPI-2. If not, see <http://www.gnu.org/licenses/>.
 #include <cuda_runtime.h>
 #define GASPI_CUDA_EVENTS 2
 #define GASPI_GPU_DIRECT_MAX (32*1024)
-#define GASPI_GPU_BUFFERED  (128*1024)
+#define GASPI_GPU_BUFFERED  (256*1024)
 
 typedef struct {
   unsigned long offset_local, offset_remote, size;
