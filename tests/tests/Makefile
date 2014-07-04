@@ -9,7 +9,7 @@ ifneq (, $(findstring -DGPI2_WITH_MPI,$(CFLAGS)))
 	SUBDIRS+=mpi
 endif
 
-PHONY: subdirs $(SUBDIRS)
+.PHONY: subdirs $(SUBDIRS) clean
 
 install: subdirs
 	$(foreach dir, $(SUBDIRS), cp $(dir)/*.bin ../bin;)
@@ -18,7 +18,6 @@ subdirs: $(SUBDIRS)
 
 $(SUBDIRS): test_utils.o
 	$(MAKE) -C $@
-
 
 %.o: %.c
 	$(CC) $(CFLAGS) -I. -c $^
