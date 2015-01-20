@@ -66,7 +66,7 @@ static int _gaspi_find_GPU_numa_node(int cudevice)
     return -1;
 
   int numa_node;
-  fscanf (sysfile, "%1d", &numa_node);
+  fscanf (sysfile, "%2d", &numa_node);
   fclose(sysfile);
 
   return numa_node;
@@ -86,7 +86,7 @@ static int _gaspi_find_GPU_ib_numa_node()
     return -1;
 
   int numa_node;
-  fscanf (sysfile, "%1d", &numa_node);
+  fscanf (sysfile, "%2d", &numa_node);
   fclose(sysfile);
 
   return numa_node;
