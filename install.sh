@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 GPI2_PATH=/opt/GPI2
 OFED_PATH=""
@@ -89,7 +89,7 @@ while getopts ":p:o:-:" opt; do
 		    ;;
 		with-fortran=*)
 		val=${OPTARG#*=}
-		if [ "$val" == "false" ]; then
+		if [ "$val" = "false" ]; then
 		    WITH_F90=0
 		    sed -i "s,fortran,,g" tests/tests/Makefile
 		fi
@@ -100,7 +100,7 @@ while getopts ":p:o:-:" opt; do
                         which nvcc > /dev/null 2>&1
                         if [ $? != 0 ]; then
                             echo "Couldn't find CUDA installation. Please provide path to your CUDA installation."
-			    echo "    ./install.sh <other options> --with-cude=<Path to CUDA installation>"
+			    echo "    ./install.sh <other options> --with-cuda=<Path to CUDA installation>"
 			    echo ""
                             exit 1
                         fi
@@ -265,16 +265,7 @@ fi
 if [ $WITH_CUDA = 1 ]; then
 
     #check
-    #check moduel
-    if [ `modprobe -l |grep nv_peer_mem` ]; then
-      echo "nv_peer_mem module is found, continue"
-    else
-      echo "cannot find nv_peer_mem module, return"
-      echo ""
-      exit 1
-   fi
-
-    if [ -r $CUDA_PATH/include/cuda.h ]; then
+   if [ -r $CUDA_PATH/include/cuda.h ]; then
 	CUDA_INC_PATH=$CUDA_PATH/include
     else
 	    echo "Cannot find cuda.h. Please provide path to CUDA installation."
@@ -309,9 +300,9 @@ if [ $WITH_CUDA = 1 ]; then
     echo "CFLAGS += -DGPI2_CUDA -I${CUDA_INC_PATH}" >> tests/make.defines
     echo "LIB_PATH += -L${CUDA_LIB_PATH}" >> tests/make.defines  
     if [ -r $CUDA_PATH/lib64/libcuinj64.so ] ; then 
-	echo "LIBS += -lcudart -lcuinj64" >> tests/make.defines
+	echo "LIBS += -lcudart -lcuda -lcuinj64" >> tests/make.defines
     else
-	echo "LIBS += -lcudart -lcuinj32" >> tests/make.defines
+	echo "LIBS += -lcudart -lcuda -lcuinj32" >> tests/make.defines
     fi
     echo "export" >> tests/make.defines
 fi
