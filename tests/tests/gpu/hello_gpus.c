@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	       rank, num, (rank + 1 ) % num, nGPUs );
   int i;
 
-  for (i = 0; i < gpus; i++)
+  for (i = 0; i < nGPUs; i++)
     gaspi_printf("device with Id %d \n", gpus[i]);
   
   ASSERT (gaspi_proc_term(GASPI_BLOCK));
